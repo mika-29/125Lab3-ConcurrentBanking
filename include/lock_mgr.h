@@ -1,10 +1,8 @@
-#define MAX_TRANSACTIONS 256
+#ifndef LOCK_MGR_H
+#define LOCK_MGR_H
 
-typedef struct {
-    int tx_id;
-    int waiting_for_tx;         // -1 if not waiting
-    int waiting_for_account;
-} WaitForEntry;
+#include "bank.h"
 
-WaitForEntry wait_graph[MAX_TRANSACTIONS];
-pthread_mutex_t graph_lock;
+bool transfer(int from_id, int to_id, int amount_centavos);
+
+#endif
