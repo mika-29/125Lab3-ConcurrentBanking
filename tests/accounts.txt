@@ -1,0 +1,12 @@
+# AccountID  InitialBalanceCentavos
+# balances are in centavos (PHP 1.00 = 100 centavos)
+0   10000
+1   25000
+2   10000
+3   10000
+4   10000
+5   10000
+6   10000
+10  50000
+20  30000
+ 
