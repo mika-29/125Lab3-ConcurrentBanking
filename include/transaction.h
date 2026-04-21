@@ -1,4 +1,14 @@
-typedef enum { OP_DEPOSIT, OP_WITHDRAW, OP_TRANSFER, OP_BALANCE } OpType;
+#ifndef TRANSACTION_H
+#define TRANSACTION_H
+
+#include <pthread.h>
+
+typedef enum { 
+    OP_DEPOSIT, 
+    OP_WITHDRAW, 
+    OP_TRANSFER, 
+    OP_BALANCE 
+} OpType;
 
 typedef struct {
     OpType type;
@@ -7,7 +17,11 @@ typedef struct {
     int target_account;         // TRANSFER only
 } Operation;
 
-typedef enum { TX_RUNNING, TX_COMMITTED, TX_ABORTED } TxStatus;
+typedef enum { 
+    TX_RUNNING, 
+    TX_COMMITTED, 
+    TX_ABORTED 
+} TxStatus;
 
 typedef struct {
     int tx_id;
@@ -20,3 +34,7 @@ typedef struct {
     int wait_ticks;
     TxStatus status;
 } Transaction;
+
+void *exec_transac(void *arg);
+
+#endif
