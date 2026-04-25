@@ -71,7 +71,10 @@ void *exec_transac(void *arg) {
 
         pthread_mutex_lock(&tick_lock);
         tx->wait_ticks += (global_tick - tick_before);
+        int next_tick = global_tick + 1;
         pthread_mutex_unlock(&tick_lock);
+
+        wait_for_tick(next_tick);    
     }
 
     pthread_mutex_lock(&tick_lock);

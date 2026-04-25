@@ -25,9 +25,9 @@ void *timer_thread(void *arg) {
 
      while(simul_running) {
         usleep((useconds_t)(tick_interval_ms * 1000));
+        if (!simul_running) break; 
         pthread_mutex_lock(&tick_lock);
         global_tick++;
-        printf("Tick %d:\n", global_tick);
         pthread_cond_broadcast(&tick_changed);
         pthread_mutex_unlock(&tick_lock);
      }

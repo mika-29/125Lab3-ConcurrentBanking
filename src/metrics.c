@@ -43,21 +43,21 @@ void print_metrics(Transaction *transactions, int num_transactions) {
                 tx->wait_ticks, status_str);
     
         total_wait += tx->wait_ticks;
-    }
 
     if (tx->actual_end > max_end_tick) {
         max_end_tick = tx->actual_end;
     }
 
-    double avg_wait   = num_transactions > 0 ? (double)total_wait / num_transactions : 0.0;
-    double throughput = max_end_tick > 0
-                        ? (double)num_transactions / max_end_tick
-                        : 0.0;
- 
-    printf("\nTotal transactions : %d\n", num_transactions);
-    printf("Committed          : %d\n", committed);
-    printf("Aborted            : %d\n", aborted);
-    printf("Total ticks        : %d\n", max_end_tick);
-    printf("Average wait time  : %.2f ticks\n", avg_wait);
-    printf("Throughput         : %.2f tx/tick\n", throughput);
+        double avg_wait   = num_transactions > 0 ? (double)total_wait / num_transactions : 0.0;
+        double throughput = max_end_tick > 0
+                            ? (double)num_transactions / max_end_tick
+                            : 0.0;
+    
+        printf("\nTotal transactions : %d\n", num_transactions);
+        printf("Committed          : %d\n", committed);
+        printf("Aborted            : %d\n", aborted);
+        printf("Total ticks        : %d\n", max_end_tick);
+        printf("Average wait time  : %.2f ticks\n", avg_wait);
+        printf("Throughput         : %.2f tx/tick\n", throughput);
+    }
 }
