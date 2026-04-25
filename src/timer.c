@@ -34,13 +34,14 @@ void *timer_thread(void *arg) {
 
     printf("Timer thread exiting...\n");
     return NULL;
-
-    void wait_for_tick(int target_tick) {
-        pthread_mutex_lock(&tick_lock);
-
-        while(global_tick < target_tick) {
-            pthread_cond_wait(&tick_changed, &tick_Lock);
-        }
-        pthread_mutex_unlock(&tick_lock);
-    }
 }
+
+void wait_for_tick(int target_tick) {
+    pthread_mutex_lock(&tick_lock);
+
+    while(global_tick < target_tick) {
+        pthread_cond_wait(&tick_changed, &tick_lock);
+    }
+    pthread_mutex_unlock(&tick_lock);
+}
+

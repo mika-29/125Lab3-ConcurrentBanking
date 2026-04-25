@@ -1,6 +1,8 @@
+#include <stdio.h> 
 #include <stdlib.h>
 #include "transaction.h"
 #include "timer.h"
+#include "bank.h"  
 
 void *exec_transac(void *arg) {
     Transaction *tx = (Transaction *)arg;
@@ -21,7 +23,7 @@ void *exec_transac(void *arg) {
         pthread_mutex_unlock(&tick_lock);
 
         switch(op->type) {
-            case OP_DESPOSIT:
+            case OP_DEPOSIT:
                 printf("[T%d] DEPOSIT account %d amount %d centavos\n", tx->tx_id, op->account_id, op->amount_centavos);
                 deposit(op->account_id, op->amount_centavos);
                 printf("[T%d] DEPOSIT successful\n", tx->tx_id);

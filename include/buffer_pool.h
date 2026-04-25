@@ -1,4 +1,12 @@
+#ifndef BUFFER_POOL_H       
+#define BUFFER_POOL_H 
+
 #define BUFFER_POOL_SIZE 5
+
+#include <semaphore.h>
+#include <pthread.h>
+#include <stdbool.h> 
+#include "bank.h"
 
 typedef struct {
     int account_id;
@@ -12,3 +20,5 @@ typedef struct {
     sem_t full_slots;
     pthread_mutex_t pool_lock;
 } BufferPool;
+
+#endif
