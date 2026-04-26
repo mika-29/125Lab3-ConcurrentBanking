@@ -143,14 +143,14 @@ int main(int argc, char *argv[]) {
             pthread_join(txs[i].thread, NULL);
         }
 
-        Transaction *tx = &txs[i];
-        for (int j = 0; j < tx->num_ops; j++) {
-            Operation *op = &tx->ops[j];
-            buffer_pool_unload(op->account_id);
-            if (op->type == OP_TRANSFER) {
-                buffer_pool_unload(op->target_account);
-            }
-        }
+        // Transaction *tx = &txs[i];
+        // for (int j = 0; j < tx->num_ops; j++) {
+        //     Operation *op = &tx->ops[j];
+        //     buffer_pool_unload(op->account_id);
+        //     if (op->type == OP_TRANSFER) {
+        //         buffer_pool_unload(op->target_account);
+        //     }
+        // }
     }
 
     // Stop timer thread
