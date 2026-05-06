@@ -21,7 +21,8 @@ void *exec_transac(void *arg) {
     }
 
     tx->status = TX_RUNNING;
-    printf("Transaction %d started at tick %d\n", tx->tx_id, tx->actual_start);
+    printf("\nTick %d:\n", tx->actual_start);
+    printf("T%d started\n", tx->tx_id);
 
     for(int i = 0; i < tx->num_ops; i++) {
         Operation *op = &tx->ops[i];
@@ -32,12 +33,14 @@ void *exec_transac(void *arg) {
 
         switch(op->type) {
             case OP_DEPOSIT:
+                printf("Tick %d:\n", global_tick);
                 printf("[T%d] DEPOSIT account %d amount %d centavos\n", tx->tx_id, op->account_id, op->amount_centavos);
                 deposit(op->account_id, op->amount_centavos);
                 printf("[T%d] DEPOSIT successful\n", tx->tx_id);
                 break;
 
             case OP_WITHDRAW:
+                printf("Tick %d:\n", global_tick);
                 printf("[T%d] WITHDRAW account %d amount %d centavos\n", tx->tx_id, op->account_id, op->amount_centavos);
                 if (!withdraw(op->account_id, op->amount_centavos)) {
                      printf("[T%d] WITHDRAW FAILED – insufficient funds. Transaction ABORTED.\n", tx->tx_id);
@@ -59,6 +62,7 @@ void *exec_transac(void *arg) {
                 break;
             
             case OP_TRANSFER:
+                printf("Tick %d:\n", global_tick);
                 printf("[T%d] TRANSFER from account %d to account %d amount %d centavos\n", tx->tx_id, op->account_id, op->target_account, op->amount_centavos);
                 if(!transfer(op->account_id, op->target_account, op->amount_centavos)) {
                     printf("[T%d] TRANSFER FAILED – insufficient funds.Transaction ABORTED.\n", tx->tx_id);
@@ -81,6 +85,7 @@ void *exec_transac(void *arg) {
             
             case OP_BALANCE: {
                 int balance = get_balance(op->account_id);
+                printf("Tick %d:\n", global_tick);
                 printf("[T%d] BALANCE account %d = PHP %d.%02d\n", tx->tx_id, op->account_id, balance / 100, balance % 100);
                 break;
             }

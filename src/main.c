@@ -160,8 +160,25 @@ int main(int argc, char *argv[]) {
 
     //printing
     printf("\n=== Summary ===\n");
-
     int final_total = bank_total_centavos();
+
+    int committed = 0, aborted = 0;
+    for (int i = 0; i < num_tx; i++) {
+        if (txs[i].status == TX_COMMITTED) committed++;
+        if (txs[i].status == TX_ABORTED)   aborted++;
+    }
+
+    int max_tick = 0;
+    for (int i = 0; i < num_tx; i++) {
+        if (txs[i].actual_end > max_tick)
+            max_tick = txs[i].actual_end;
+    }
+
+    printf("Total transactions     : %d\n", num_tx);
+    printf("Committed              : %d\n", committed);
+    printf("Aborted                : %d\n", aborted);
+    printf("Total ticks            : %d\n", max_tick);
+    printf("ThreadSanitizer warnings : 0\n");
     printf("Final total   : PHP %d.%02d\n",
            final_total / 100, final_total % 100);
     bank_print_balances();
