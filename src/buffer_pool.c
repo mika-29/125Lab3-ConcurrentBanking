@@ -79,9 +79,7 @@ void buffer_pool_load(int account_id) {                                    //Pro
     sem_post(&buffer_pool.full_slots);   
 }
 
-void buffer_pool_unload(int account_id) {                               //Consumer — unload an account from the pool (after committing changes to the bank).    
-    sem_wait(&buffer_pool.full_slots);   
-
+void buffer_pool_unload(int account_id) {                               //Consumer — unload an account from the pool (after committing changes to the bank).     
     pthread_mutex_lock(&buffer_pool.pool_lock);
 
     for (int i = 0; i < BUFFER_POOL_SIZE; i++) {

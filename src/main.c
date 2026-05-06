@@ -118,16 +118,13 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < num_tx; i++) {
         Transaction *tx = &txs[i];
-        for (int j = 0; j < tx->num_ops; j++) {
-            Operation *op = &tx->ops[j];
 
-            if (verbose && op->type == OP_TRANSFER) {
-                lock_mgr_log_order(op->account_id, op->target_account);
-            }
-
-            buffer_pool_load(op->account_id);
-            if (op->type == OP_TRANSFER) {
-                buffer_pool_load(op->target_account);
+        if (verbose && tx->num_ops > 0) {
+            for (int j = 0; j < tx->num_ops; j++) {
+                Operation *op = &tx->ops[j];
+                if (op->type == OP_TRANSFER) {
+                    lock_mgr_log_order(op->account_id, op->target_account);
+                }
             }
         }
 

@@ -3,6 +3,7 @@
 #include "transaction.h"
 #include "timer.h"
 #include "bank.h"  
+#include "buffer_pool.h"
 
 void *exec_transac(void *arg) {
     Transaction *tx = (Transaction *)arg;
@@ -11,6 +12,13 @@ void *exec_transac(void *arg) {
     pthread_mutex_lock(&tick_lock);
     tx->actual_start = global_tick;
     pthread_mutex_unlock(&tick_lock);
+
+    for(int i = 0; i < tx->num_ops; i++) {
+        buffer_pool_load(tx->ops[i].account_id);
+        if (tx->ops[i].type == OP_TRANSFER) {
+            buffer_pool_load(tx->ops[i].target_account);
+        }
+    }
 
     tx->status = TX_RUNNING;
     printf("Transaction %d started at tick %d\n", tx->tx_id, tx->actual_start);
@@ -39,6 +47,12 @@ void *exec_transac(void *arg) {
                      tx->actual_end = global_tick;
                      pthread_mutex_unlock(&tick_lock);
 
+                     for (int j = 0; j < tx->num_ops; j++) {
+                        buffer_pool_unload(tx->ops[j].account_id);
+                        if (tx->ops[j].type == OP_TRANSFER)
+                            buffer_pool_unload(tx->ops[j].target_account);
+                    }
+
                      return NULL;
                 }
                 printf("[T%d] WITHDRAW successful\n", tx->tx_id);
@@ -53,6 +67,12 @@ void *exec_transac(void *arg) {
                     pthread_mutex_lock(&tick_lock);
                     tx->actual_end = global_tick;
                     pthread_mutex_unlock(&tick_lock);
+
+                    for (int j = 0; j < tx->num_ops; j++) {
+                        buffer_pool_unload(tx->ops[j].account_id);
+                        if (tx->ops[j].type == OP_TRANSFER)
+                            buffer_pool_unload(tx->ops[j].target_account);
+                    }
 
                     return NULL;
                 }
@@ -71,10 +91,8 @@ void *exec_transac(void *arg) {
 
         pthread_mutex_lock(&tick_lock);
         tx->wait_ticks += (global_tick - tick_before);
-        int next_tick = global_tick + 1;
+        //int next_tick = global_tick + 1;
         pthread_mutex_unlock(&tick_lock);
-
-        wait_for_tick(next_tick);    
     }
 
     pthread_mutex_lock(&tick_lock);
@@ -83,6 +101,13 @@ void *exec_transac(void *arg) {
 
     tx->status = TX_COMMITTED;
     printf("[T%d] COMMITTED at tick %d (waited %d ticks total)\n", tx->tx_id, tx->actual_end, tx->wait_ticks);
+
+    for (int i = 0; i < tx->num_ops; i++) {
+        buffer_pool_unload(tx->ops[i].account_id);
+        if (tx->ops[i].type == OP_TRANSFER) {
+            buffer_pool_unload(tx->ops[i].target_account);
+        }
+    }
     return NULL;
 
 }

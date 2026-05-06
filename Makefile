@@ -13,7 +13,7 @@ test: all
 	@echo ""
 	@echo " Test 1: No Conflicts (trace_simple.txt)"
 	@echo "========================================================" 
-	./$(TARGET) --accounts=tests/accounts.txt --trace=tests/trace_simple.txt --deadlock=prevention --tick-ms=100
+	./$(TARGET) --accounts=tests/accounts_simple.txt --trace=tests/trace_simple.txt --deadlock=prevention --tick-ms=100
 	@echo ""
 	@echo " Test 2: Concurrent Readers (trace_readers.txt)"
 	@echo "========================================================"
@@ -25,7 +25,7 @@ test: all
 	@echo ""
 	@echo " Test 4: Insufficient Funds (trace_abort.txt)"
 	@echo "========================================================"
-	./$(TARGET) --accounts=tests/accounts.txt --trace=tests/trace_abort.txt --deadlock=prevention --tick-ms=100
+	./$(TARGET) --accounts=tests/accounts_abort.txt --trace=tests/trace_abort.txt --deadlock=prevention --tick-ms=100
 	@echo ""
 	@echo " Test 5: Buffer Pool Saturation (trace_buffer.txt)"
 	@echo "========================================================"
