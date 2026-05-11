@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "bank.h"
+#include "timer.h"
 
 Bank bank;
 
@@ -84,15 +85,14 @@ int get_balance(int account_id) {
 
 void deposit(int account_id, int amount_centavos) {
     int idx = bank_find_account(account_id);
-
-    if (idx == -1) {
-        fprintf(stderr, "[BANK] ERROR: account with id %d not found\n", account_id);
-        return;
-    }
+    if (idx == -1) { fprintf(stderr, "..."); return; }
 
     Account *acc = &bank.accounts[idx];
 
+    //int tick_before = global_tick;          
     pthread_rwlock_wrlock(&acc->lock);
+    //int waited = global_tick - tick_before; 
+
     acc->balance_centavos += amount_centavos;
     pthread_rwlock_unlock(&acc->lock);
 }

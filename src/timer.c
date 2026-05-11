@@ -5,7 +5,7 @@
 volatile int global_tick = 0;
 pthread_mutex_t tick_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t tick_changed = PTHREAD_COND_INITIALIZER;
-int tick_interval_ms = 1000; 
+int tick_interval_ms = 100; 
 volatile int simul_running = 1;
 
 void timer_init(void) {
@@ -39,7 +39,7 @@ void *timer_thread(void *arg) {
 void wait_for_tick(int target_tick) {
     pthread_mutex_lock(&tick_lock);
 
-    while(global_tick < target_tick) {
+    while(global_tick <= target_tick) {   //change back to <= if mabalik zero ang tables 
         pthread_cond_wait(&tick_changed, &tick_lock);
     }
     pthread_mutex_unlock(&tick_lock);

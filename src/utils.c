@@ -142,6 +142,7 @@ Transaction *parse_trace(const char *filename, int *out_count) {                
             op->account_id      = acc;
             op->amount_centavos = amount;
             op->target_account  = -1;
+            op->tick            = start_tick; 
 
         } else if (strcmp(op_str, "WITHDRAW") == 0) {
             int acc, amount;
@@ -156,6 +157,7 @@ Transaction *parse_trace(const char *filename, int *out_count) {                
             op->account_id      = acc;
             op->amount_centavos = amount;
             op->target_account  = -1;
+            op->tick            = start_tick; 
 
         } else if (strcmp(op_str, "TRANSFER") == 0) {
             int from_acc, to_acc, amount;
@@ -171,6 +173,7 @@ Transaction *parse_trace(const char *filename, int *out_count) {                
             op->account_id      = from_acc;
             op->target_account  = to_acc;
             op->amount_centavos = amount;
+            op->tick            = start_tick;
 
         } else if (strcmp(op_str, "BALANCE") == 0) {
             int acc;
@@ -185,6 +188,7 @@ Transaction *parse_trace(const char *filename, int *out_count) {                
             op->account_id      = acc;
             op->amount_centavos = 0;
             op->target_account  = -1;
+            op->tick            = start_tick;
 
         } else {
             fprintf(stderr, "[UTILS] trace line %d: unknown op '%s'\n",

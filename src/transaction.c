@@ -7,27 +7,29 @@
 
 void *exec_transac(void *arg) {
     Transaction *tx = (Transaction *)arg;
-    wait_for_tick(tx->start_tick);
 
-    pthread_mutex_lock(&tick_lock);
-    tx->actual_start = global_tick;
-    pthread_mutex_unlock(&tick_lock);
+    // wait_for_tick(tx->start_tick);
+    // pthread_mutex_lock(&tick_lock);
+    // tx->actual_start = global_tick;
+    // pthread_mutex_unlock(&tick_lock);
 
     for(int i = 0; i < tx->num_ops; i++) {
         buffer_pool_load(tx->ops[i].account_id);
-        if (tx->ops[i].type == OP_TRANSFER) {
+        if (tx->ops[i].type == OP_TRANSFER) 
             buffer_pool_load(tx->ops[i].target_account);
-        }
     }
 
     tx->status = TX_RUNNING;
-    printf("\nTick %d:\n", tx->actual_start);
-    printf("T%d started\n", tx->tx_id);
+    // printf("\nTick %d:\n", tx->actual_start);
+    // printf("T%d started\n", tx->tx_id);
 
     for(int i = 0; i < tx->num_ops; i++) {
         Operation *op = &tx->ops[i];
 
+        wait_for_tick(op->tick); 
+
         pthread_mutex_lock(&tick_lock);
+        if (i == 0) tx->actual_start = global_tick;
         int tick_before = global_tick;
         pthread_mutex_unlock(&tick_lock);
 

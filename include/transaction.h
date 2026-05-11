@@ -15,6 +15,7 @@ typedef struct {
     int account_id;
     int amount_centavos;
     int target_account;         // TRANSFER only
+    int tick; 
 } Operation;
 
 typedef enum { 
