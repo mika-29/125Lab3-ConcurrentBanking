@@ -23,10 +23,16 @@ void *timer_thread(void *arg) {
 
      printf("Timer thread started [Tick interval: %d ms]\n", tick_interval_ms);
 
-     while(simul_running) {
+     while(1) {
         usleep((useconds_t)(tick_interval_ms * 1000));
-        if (!simul_running) break; 
+    
         pthread_mutex_lock(&tick_lock);
+
+        if(!simul_running){
+            pthread_mutex_unlock(&tick_lock);
+            break;
+        }
+        
         global_tick++;
         pthread_cond_broadcast(&tick_changed);
         pthread_mutex_unlock(&tick_lock);

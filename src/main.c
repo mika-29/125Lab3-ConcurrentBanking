@@ -136,9 +136,8 @@ int main(int argc, char *argv[]) {
 
     //wait all threads to finish 
     for (int i = 0; i < num_tx; i++) {
-        if (txs[i].status != TX_ABORTED || txs[i].thread != 0) {
             pthread_join(txs[i].thread, NULL);
-        }
+    }
 
         // Transaction *tx = &txs[i];
         // for (int j = 0; j < tx->num_ops; j++) {
@@ -148,7 +147,6 @@ int main(int argc, char *argv[]) {
         //         buffer_pool_unload(op->target_account);
         //     }
         // }
-    }
 
     // Stop timer thread
     pthread_mutex_lock(&tick_lock);
