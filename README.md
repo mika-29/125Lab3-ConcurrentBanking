@@ -1,49 +1,69 @@
-# Design Notes 
+# Concurrent Banking - CMSC 125 [Lab3] 
 
-## Problem Analysis 
-The Concurrent Banking System highlights the challenge of balancing performance and correctness in a multi-threaded environment. While multiple transactions should run simultaneously for efficiency, improper handling of shared data (e.g., account balances) can lead to race conditions and incorrect results.
+## Group Members 
+- Michaela F. Borces
+- Marinelle Joan U. Tambolero
 
-The system must also handle deadlocks, especially in transactions involving multiple accounts, where threads may wait indefinitely due to circular dependencies. In addition, limited resources such as the buffer pool create contention, requiring proper management to ensure fair access and avoid delays.
+## Compilation
 
-Another challenge is enforcing deterministic execution despite the non-deterministic nature of thread scheduling. Transactions must follow a defined timeline using a global clock mechanism.
+**Normal build:**
+```bash
+make
+```
 
-Overall, the problem involves coordinating transaction timing, managing limited resources, and ensuring safe access to shared data without sacrificing system efficiency.
+**Debug build (ThreadSanitizer):**
+```bash
+make debug
+```
 
-## Solution Architecture
-The banking system follows a **Multi-threaded Transaction Processing** design.
+**Note for WSL2 users:** Run this before using the debug build:
+```bash
+sudo sysctl vm.mmap_rnd_bits=28
+```
 
-**>>Initialization**
-The system loads initial account balances from `accounts.txt` and transaction
-workloads from `trace.txt`. It initializes all locks, semaphores, and the 
-buffer pool, then spawns the timer thread before launching transaction threads.
+**Clean:**
+```bash
+make clean
+```
 
-**>>Time Simulation**
-A dedicated timer thread increments the global clock every N milliseconds and
-broadcasts to all waiting transaction threads via `pthread_cond_broadcast()`.
-Transactions wait for their scheduled `start_tick` using `wait_until_tick()`
-before beginning execution.
+## Usage
 
-**>>Transaction Execution**
-Each transaction runs in its own pthread following this pipeline:
+```bash
+./bankdb --accounts=FILE --trace=FILE [OPTIONS]
+```
 
-**Wait:** The transaction sleeps until the global clock reaches its `start_tick`.
+**Required:**
+- `--accounts=FILE` — Initial account balances file
+- `--trace=FILE` — Transaction trace file
 
-**Load:** The transaction acquires a buffer slot from the pool using semaphores.
-If the pool is full, it blocks until a slot is freed.
+**Optional:**
+- `--deadlock=prevention|detection` — Deadlock strategy (default: prevention)
+- `--tick-ms=N` — Milliseconds per tick (default: 100)
+- `--verbose` — Print detailed lock ordering logs
 
-**Execute:** Each operation is processed in order:
-   >DEPOSIT and WITHDRAW acquire a write lock on the account using
-   `pthread_rwlock_wrlock()`.
+**Example:**
+```bash
+./bankdb --accounts=tests/accounts.txt --trace=tests/trace_deadlock.txt --deadlock=prevention --tick-ms=100 --verbose
+```
 
-   >BALANCE acquires a read lock using `pthread_rwlock_rdlock()`, allowing
-   multiple transactions to read simultaneously.
+**Run all tests:**
+```bash
+make test
+```
 
-   >TRANSFER locks both accounts in ascending ID order via `lock_mgr.c`
-   to prevent deadlock through lock ordering.
+## Implemented Features
 
-**Unload:** The transaction releases its buffer slot and signals waiting threads.
+- Multi-threaded transaction execution — each transaction runs in its own pthread
+- Global simulation clock via dedicated timer thread with per-operation tick scheduling
+- Reader-writer locks for concurrent account access (pthread_rwlock_t)
+- Deadlock prevention via lock ordering — always locks lower account index first, breaking circular wait
+- Bounded buffer pool (5 slots) using POSIX semaphores with producer-consumer pattern
+- Four operation types: DEPOSIT, WITHDRAW, TRANSFER, BALANCE
+- Clean abort handling for insufficient funds with proper buffer slot cleanup
+- Transaction Performance Metrics — ActualStart, End, WaitTicks, and Status per transaction
+- Money conservation check for transfer-only workloads
+- Buffer Pool Report — total loads/unloads, peak usage, blocked operations
 
-**>>Termination**
-Once all transactions finish, the system prints a full metrics report including
-per-transaction stats, buffer pool usage, and a balance conservation check to
-verify no money was created or lost during execution.
+## Known Limitations
+
+- ThreadSanitizer on WSL2 requires `sudo sysctl vm.mmap_rnd_bits=28` before running the debug build
